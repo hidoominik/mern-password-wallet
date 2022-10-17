@@ -15,11 +15,15 @@ export default makeStyles({
   },
   card: {
     display: 'flex',
-    flexDirection: 'column',
+    flexDirection: 'row',
     justifyContent: 'space-between',
     borderRadius: '15px',
+    margin: '30px 0',
     height: '100%',
     position: 'relative',
+    padding: '20px ',
+    flexWrap: 'wrap'
+    
   },
   overlay: {
     position: 'absolute',
@@ -44,6 +48,7 @@ export default makeStyles({
   title: {
     padding: '0 16px',
   },
+
   cardActions: {
     padding: '0 16px 8px 16px',
     display: 'flex',
