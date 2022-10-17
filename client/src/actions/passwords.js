@@ -22,3 +22,21 @@ export const createPassword = (password) => async(dispatch) => {
         console.log(error)
     }
 }
+
+export const updatePassword = (id, password) => async(dispatch) =>{
+    try {
+        const {data}= await api.updatePassword(id, password);
+        dispatch({type:'UPDATE',payload:data });
+    } catch (error) {
+        console.log(error)
+    }
+}
+
+export const deletePassword = (id) => async(dispatch)=>{
+    try {
+        await api.deletePassword(id);
+        dispatch({type:'DELETE', payload:id})
+    } catch (error) {
+        console.log(error)
+    }
+}

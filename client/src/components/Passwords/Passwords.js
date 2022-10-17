@@ -5,7 +5,7 @@ import { useSelector } from 'react-redux';
 import useStyles from './styles'
 
 
-const Passwords = () => {
+const Passwords = ({setCurrentId}) => {
     const classes = useStyles();
     const passwords = useSelector((state)=>state.passwords); //.password from reducers>passwords
     console.log(passwords)
@@ -14,7 +14,7 @@ const Passwords = () => {
       <Container alignitems="stretch" spacing={3} >
         {passwords.map((password) => (
           <div key={password.id} xs={12} sm={6}>
-              <Password password={password} />
+              <Password password={password} setCurrentId={setCurrentId}/>
           </div>
         ))}
       </Container>

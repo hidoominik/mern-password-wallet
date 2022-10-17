@@ -1,3 +1,4 @@
+import mongoose from "mongoose";
 import PasswordModel from "../models/passwordModel.js";
 
 
@@ -28,4 +29,22 @@ export const createPassword = async(request, response) => {
         response.status(409).json({message: error.message})
       
     }
+}
+
+export const updatePassword = async(request, response) => {
+    const {id: _id} = request.params;
+    const password = request.body;
+
+    if(!mongoose.Types.ObjectId.isValid(_id)) return response.status(404).send('No password with that id');
+    const updatedPassword = await PasswordModel.findByIdAndUpdate(_id, password, {new: true});
+    response.json(updatedPassword);
+
+}
+
+export const deletePassword = async(req, res) =>{
+    const {id: _id} = req.params;
+    if(!mongoose.Types.ObjectId.isValid(_id)) return response.status(404).send('No password with that id');
+    await PasswordModel.findByIdAndRemove(_id);
+    res.json({message:'Password deleted succesfully'});
+    
 }

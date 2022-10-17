@@ -1,23 +1,32 @@
-import React, {useState} from 'react'
+import React, {useState, useEffect} from 'react'
 import useStyles from './styles'
 import {TextField, Button, Typography, Paper} from '@material-ui/core';
 import { useDispatch } from 'react-redux';
-import { createPassword } from '../../actions/passwords';
+import { createPassword, updatePassword } from '../../actions/passwords';
+import { useSelector } from 'react-redux';
 
-const Form = () => {
+const Form = ({currentId, setCurrentId}) => {
   const classes = useStyles();
+  const password = useSelector((state)=>currentId ? state.passwords.find((p)=>p._id===currentId) : null);
   const [passwordData, setPasswordData] = useState({
     login:'',
     password:'',
     webAddress: '',
     description:''
   });
-
+  useEffect(()=>{
+    if(password) setPasswordData(password);
+  },[password])
   const dispatch = useDispatch();
   const handleSubmit = (e) => {
         console.log("Submit Click!");
         e.preventDefault();
-        dispatch(createPassword(passwordData))
+        if(currentId){
+          dispatch(updatePassword(currentId, passwordData))
+        }else{
+          dispatch(createPassword(passwordData))
+        }
+        
     }
   const clear = () => {
     console.log("Clear!")
