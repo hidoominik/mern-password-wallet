@@ -8,7 +8,8 @@ const Auth = () => {
     const classes = useStyles();
     const [showPassword, setShowPassword] = useState(false);
     const [isSignup, setIsSignup] = useState(false);
-    
+    const [isPasswordKeptAsHash, setIsPasswordKeptAsHash] = useState(true);
+
     const handleShowPassword = () => setShowPassword((prevShowPassword) => !prevShowPassword);
 
     const handleSubmit =()=>{
@@ -20,10 +21,11 @@ const Auth = () => {
 
     const switchMode =()=> {
         setIsSignup((prevMode) => !prevMode);
-        handleShowPassword(false)
+        setShowPassword(false)
     }
 
-    
+    const switchPasswordStoreMode=()=>setIsPasswordKeptAsHash((prevMode) => !prevMode);
+   
 
 
   return (
@@ -45,10 +47,21 @@ const Auth = () => {
                     }
                     <Input name='username' label="Username" handleChange={handleChange} type='text' autoFocus/>
                     <Input name='password' label='Password' handleChange={handleChange} type = {showPassword ? "text" : "password"} handleShowPassword={handleShowPassword}/>
-                    { isSignup && <Input name="confirmPassword" label="Repeat password" handleChange = {handleChange} type="password" />}
+                    { isSignup && (
+                        <>
+                            <Input name="confirmPassword" label="Repeat password" handleChange = {handleChange} type="password" />
+                            <Typography align='right' variant='subtitle1'>Password will be stored using: </Typography>
+                            <Button fullWidth  onClick={switchPasswordStoreMode}>
+                            {isPasswordKeptAsHash ? ` SHA512  (Click to change)` : 'HMAC (Click to change)'}
+
+                            </Button>
+                           
+                        </>
+                    )}
+            
                 </Grid>
                 <Button type ="submit" fullWidth variant="contained" color="primary" className={classes.submit}>{isSignup ? 'Sign Up' : 'Sign In'} </Button>
-                <Grid container justifyContent='flex-end'>
+                <Grid container justifyContent='center'>
                     <Grid item>
                         <Button onClick={switchMode}>
                             {isSignup ? 'Already have an account? Sign in!' : 'No account yet? Sign up!'}
