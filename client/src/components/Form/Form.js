@@ -23,13 +23,21 @@ const Form = ({currentId, setCurrentId}) => {
         e.preventDefault();
         if(currentId){
           dispatch(updatePassword(currentId, passwordData))
+          .then(clear())
         }else{
           dispatch(createPassword(passwordData))
+          .then(clear())
         }
         
     }
   const clear = () => {
-    console.log("Clear!")
+    setCurrentId(null);
+    setPasswordData({
+      login:'',
+      password:'',
+      webAddress: '',
+      description:''
+    })
   }
   return (
     <Paper className={classes.paper}>

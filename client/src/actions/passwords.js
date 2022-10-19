@@ -1,11 +1,11 @@
 import * as api from "../api";
-
+import { FETCH_ALL, CREATE, UPDATE, DELETE } from "../constants/actionTypes";
 //Action creators
 
 export const getPasswords = () => async(dispatch) => {
     try {
         const { data } = await api.fetchPasswords();
-        dispatch({type: 'FETCH_ALL', payload:data});
+        dispatch({type: FETCH_ALL, payload:data});
     } catch (error) {
         console.log(error)
     }
@@ -16,7 +16,7 @@ export const getPasswords = () => async(dispatch) => {
 export const createPassword = (password) => async(dispatch) => {
     try {
         const {data} = await api.createPassword(password);
-        dispatch({type: 'CREATE', payload:data });
+        dispatch({type: CREATE, payload:data });
 
     } catch (error) {
         console.log(error)
@@ -26,7 +26,7 @@ export const createPassword = (password) => async(dispatch) => {
 export const updatePassword = (id, password) => async(dispatch) =>{
     try {
         const {data}= await api.updatePassword(id, password);
-        dispatch({type:'UPDATE',payload:data });
+        dispatch({type: UPDATE,payload:data });
     } catch (error) {
         console.log(error)
     }
@@ -35,7 +35,7 @@ export const updatePassword = (id, password) => async(dispatch) =>{
 export const deletePassword = (id) => async(dispatch)=>{
     try {
         await api.deletePassword(id);
-        dispatch({type:'DELETE', payload:id})
+        dispatch({type: DELETE, payload:id})
     } catch (error) {
         console.log(error)
     }
