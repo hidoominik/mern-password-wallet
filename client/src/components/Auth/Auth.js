@@ -1,22 +1,34 @@
 import React, {useState} from 'react';
-import {Avatar, Button, Paper, Grid, Typography, Container} from '@material-ui/core';
+import {Avatar, Button, Paper, Grid, Typography, Container, Select, MenuItem} from '@material-ui/core';
 import useStyles from './styles';
 import LockOutlined from '@material-ui/icons/LockOutlined';
-
+import { useNavigate } from 'react-router-dom';
+import { useDispatch } from 'react-redux';
 import Input from './Input';
+import {signup, signin} from '../../actions/auth'
 const Auth = () => {
     const classes = useStyles();
+    const initialState = {email:'', username:'', password:'', confirmPassword:'', isPasswordHash: true}
     const [showPassword, setShowPassword] = useState(false);
     const [isSignup, setIsSignup] = useState(false);
-    const [isPasswordKeptAsHash, setIsPasswordKeptAsHash] = useState(true);
-
+    const [formData, setFormData] = useState(initialState);
+    const navigate = useNavigate();
+    const dispatch = useDispatch();
     const handleShowPassword = () => setShowPassword((prevShowPassword) => !prevShowPassword);
 
-    const handleSubmit =()=>{
+    const handleSubmit =(e)=>{
+        e.preventDefault();
         console.log("Submit!");
+        console.log(formData);
+        if(isSignup){
+            dispatch(signup(formData,navigate))
+        }else{
+
+        }
     };
-    const handleChange =()=>{
+    const handleChange =(e)=>{ //Same handle change for each field from form 
         console.log("Change!");
+        setFormData({...formData, [e.target.name]: e.target.value});
     };
 
     const switchMode =()=> {
@@ -24,7 +36,6 @@ const Auth = () => {
         setShowPassword(false)
     }
 
-    const switchPasswordStoreMode=()=>setIsPasswordKeptAsHash((prevMode) => !prevMode);
    
 
 
@@ -51,10 +62,15 @@ const Auth = () => {
                         <>
                             <Input name="confirmPassword" label="Repeat password" handleChange = {handleChange} type="password" />
                             <Typography align='right' variant='subtitle1'>Password will be stored using: </Typography>
-                            <Button fullWidth  onClick={switchPasswordStoreMode}>
-                            {isPasswordKeptAsHash ? ` SHA512  (Click to change)` : 'HMAC (Click to change)'}
-
-                            </Button>
+                            
+                            <Select
+                                name='isPasswordHash'
+                                value={formData.isPasswordHash}
+                                label="Age"
+                                onChange={handleChange}>
+                                <MenuItem value={true}>SHA256</MenuItem>
+                                <MenuItem value={false}>HMAC</MenuItem>
+                            </Select>
                            
                         </>
                     )}

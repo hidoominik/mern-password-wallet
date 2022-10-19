@@ -13,7 +13,7 @@ const Navbar= ()=> {
     const navigate = useNavigate();
     const location = useLocation();
 
-    
+
     useEffect(()=>{
         const token = user?.token;
         //JWT... 
@@ -29,7 +29,7 @@ const Navbar= ()=> {
     return(
     <AppBar className={classes.appBar} position='static' color="inherit">
         <div className={classes.brandContainer}>
-            <Typography variant='h2' component={Link} to="/" align='center'> Password Wallet </Typography>
+            <Typography variant='h3' component={Link} to="/" align='center'> Password Wallet </Typography>
             <img className={classes.heading} src={lock} alt='lock' height="60" />
 
         </div>
