@@ -6,7 +6,10 @@ import { useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import Input from './Input';
 import {signup, signin} from '../../actions/auth'
+
+
 const Auth = () => {
+    
     const classes = useStyles();
     const initialState = {email:'', username:'', password:'', confirmPassword:'', isPasswordHash: true}
     const [showPassword, setShowPassword] = useState(false);
