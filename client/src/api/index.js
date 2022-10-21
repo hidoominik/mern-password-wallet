@@ -1,8 +1,21 @@
 import axios from 'axios';
 
-const url = 'http://localhost:5000/passwords';
+const API = axios.create({ baseURL: 'http://localhost:5000' });
 
-export const fetchPasswords  = () => axios.get(url);
-export const createPassword = (newPassword) => axios.post(url, newPassword);
-export const updatePassword = (id, updatedPassword) => axios.patch(`${url}/${id}`, updatedPassword);
-export const deletePassword = (id) => axios.delete(`${url}/${id}`);
+API.interceptors.request.use((req)=>{ //send token to backend auth middleware
+    if(localStorage.getItem('profile')){
+       req.headers.Authorization = `Bearer ${JSON.parse(localStorage.getItem('profile')).token}`;
+    }
+
+    return req;
+
+});
+//const url = 'http://localhost:5000/passwords';
+
+export const fetchPasswords  = () => API.get('/passwords');
+export const createPassword = (newPassword) => API.post('/passwords', newPassword);
+export const updatePassword = (id, updatedPassword) => API.patch(`/passwords/${id}`, updatedPassword);
+export const deletePassword = (id) => API.delete(`/passwords/${id}`);
+
+export const signin = (formData) => API.post('user/signin',formData);
+export const signup = (formData) => API.post('user/signup',formData);

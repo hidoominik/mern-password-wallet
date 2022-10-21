@@ -10,6 +10,7 @@ import MoreHorizIcon from '@material-ui/icons/MoreHoriz';
 import DeleteOutline from '@material-ui/icons/DeleteOutline';
 import EditOutlined from '@material-ui/icons/EditOutlined';
 import LockOutlined from '@material-ui/icons/LockOutlined';
+import moment from 'moment';
 import { useDispatch } from "react-redux";
 import { deletePassword } from '../../../actions/passwords';
 
@@ -30,6 +31,7 @@ const Password = ({ password, setCurrentId }) => {
           <Typography variant='subtitle1'>Password:{ password.password} </Typography>
        
           <Typography variant='subtitle2'>Description:{ password.description} </Typography>
+          <Typography variant='subtitle2'>Created at: { moment(password.createdAt).fromNow()} </Typography>
         </CardContent>
         <CardActions>
         <Button>
