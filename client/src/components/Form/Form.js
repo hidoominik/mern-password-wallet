@@ -8,6 +8,7 @@ import { useSelector } from 'react-redux';
 const Form = ({currentId, setCurrentId}) => {
   const classes = useStyles();
   const password = useSelector((state)=>currentId ? state.passwords.find((p)=>p._id===currentId) : null);
+  const user = JSON.parse(localStorage.getItem('profile'));
   const [passwordData, setPasswordData] = useState({
     login:'',
     password:'',
@@ -38,6 +39,15 @@ const Form = ({currentId, setCurrentId}) => {
       webAddress: '',
       description:''
     })
+  }
+
+  if(!user?.result?.username){
+    return (
+      <Paper>
+        <Typography variant='h6' align='center'> Sign in to add your passwords</Typography>
+      </Paper>
+    )
+
   }
   return (
     <Paper className={classes.paper}>

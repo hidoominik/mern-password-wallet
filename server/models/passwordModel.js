@@ -1,6 +1,7 @@
 import mongoose from 'mongoose';
 
 const passwordSchema = mongoose.Schema({
+    creator: String,
     login: String,
     password: String,
     webAddress: String,
@@ -11,6 +12,6 @@ const passwordSchema = mongoose.Schema({
     },
 });
 
-const PasswordModel = mongoose.model('passwordModel', passwordSchema) //make our schema to an object
+const PasswordModel = mongoose.model('password', passwordSchema) //make our schema to an object
 
 export default PasswordModel;
