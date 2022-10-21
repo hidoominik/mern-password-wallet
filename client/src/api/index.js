@@ -12,7 +12,7 @@ API.interceptors.request.use((req)=>{ //send token to backend auth middleware
 });
 //const url = 'http://localhost:5000/passwords';
 
-export const fetchPasswords  = () => API.get('/passwords');
+export const fetchPasswords  = (id) => API.get(`/passwords/${id}`, id);
 export const createPassword = (newPassword) => API.post('/passwords', newPassword);
 export const updatePassword = (id, updatedPassword) => API.patch(`/passwords/${id}`, updatedPassword);
 export const deletePassword = (id) => API.delete(`/passwords/${id}`);

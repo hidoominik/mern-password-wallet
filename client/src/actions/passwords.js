@@ -2,9 +2,9 @@ import * as api from "../api";
 import { FETCH_ALL, CREATE, UPDATE, DELETE } from "../constants/actionTypes";
 //Action creators
 
-export const getPasswords = () => async(dispatch) => {
+export const getPasswords = (id) => async(dispatch) => {
     try {
-        const { data } = await api.fetchPasswords();
+        const { data } = await api.fetchPasswords(id);
         dispatch({type: FETCH_ALL, payload:data});
     } catch (error) {
         console.log(error)

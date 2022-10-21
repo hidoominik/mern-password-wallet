@@ -4,9 +4,10 @@ import PasswordModel from "../models/passwordModel.js";
 
 export const getPasswords = async(request, response)=>{
     console.log('------------------------------');
-    //console.log(response)
+    const {id: _id} = request.params;
+    
     try {
-        const passwordsData = await PasswordModel.find();
+        const passwordsData = await PasswordModel.find({creator:_id});
       
         response.status(200).json(passwordsData);
     } catch (error) {
@@ -18,9 +19,7 @@ export const getPasswords = async(request, response)=>{
 export const createPassword = async(request, response) => {
     const password = request.body;
     //here encrypt logic //
-    //console.log("Password data from req body in backend:" ,password);
-    //------------------------------------------------------------
-    //const newPassword = new PasswordModel(password);
+  
     const newPassword = new PasswordModel({...password, creator: request.userId, createdAt: new Date().toISOString()})
     try {
         await newPassword.save();

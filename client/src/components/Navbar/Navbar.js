@@ -29,6 +29,10 @@ const Navbar= ()=> {
         navigate("/auth");
     }
 
+    const changePassword=()=>{
+        
+    }
+
     return(
     <AppBar className={classes.appBar} position='static' color="inherit">
         <div className={classes.brandContainer}>
@@ -41,6 +45,7 @@ const Navbar= ()=> {
                 <div className={classes.profile}>
                     {/* //<Avatar className={classes.purple} alt={user.result.name} src={user.result.imageUrl}> {user.result.name.charAt(0)}</Avatar> */}
                     <Typography className={classes.userName} variant="h6"> Witaj, {user.result.username}</Typography>
+                    <Button variant='contained' className={classes.logout} onClick={changePassword} color='primary'>Change password</Button>
                     <Button variant='contained' className={classes.logout} onClick={logout} color='secondary'>Logout</Button>
                 </div>
             ):(
