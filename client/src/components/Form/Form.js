@@ -28,7 +28,7 @@ const Form = ({currentId, setCurrentId}) => {
         e.preventDefault();
         console.log(passwordData)
         if(currentId){
-          dispatch(updatePassword(currentId, passwordData))
+          dispatch(updatePassword(currentId, {...passwordData, userPassword: user.result.password}))
           .then(clear())
         }else{
           dispatch(createPassword({...passwordData, userPassword: user.result.password}))

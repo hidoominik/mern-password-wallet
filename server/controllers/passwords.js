@@ -39,8 +39,11 @@ export const createPassword = async(request, response) => {
 export const updatePassword = async(request, response) => {
     const {id: _id} = request.params;
     const password = request.body;
-
+    console.log(password)
     if(!mongoose.Types.ObjectId.isValid(_id)) return response.status(404).send('No password with that id');
+    const encyptedPassword = CryptoJS.AES.encrypt(password.password,CryptoJS.MD5(password.userPassword).toString());
+    password.password = encyptedPassword.toString();
+    console.log(password)
     const updatedPassword = await PasswordModel.findByIdAndUpdate(_id, password, {new: true});
     response.json(updatedPassword);
 
