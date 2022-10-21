@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 import PasswordModel from "../models/passwordModel.js";
-import crypto from 'crypto-js';
+import CryptoJS from 'crypto-js';
 
 export const getPasswords = async(request, response)=>{
     console.log('------------------------------');
@@ -20,8 +20,11 @@ export const createPassword = async(request, response) => {
     const password = request.body;
     //here encrypt logic //
     console.log(password);
-    
-    const newPassword = new PasswordModel({...password, creator: request.userId, createdAt: new Date().toISOString()})
+    console.log(password.password)
+    console.log(password.userPassword)
+    console.log(CryptoJS.MD5(password.userPassword).toString())
+    const encyptedPassword = CryptoJS.AES.encrypt(password.password,CryptoJS.MD5(password.userPassword).toString());
+    const newPassword = new PasswordModel({...password,password: encyptedPassword, creator: request.userId, createdAt: new Date().toISOString()})
     try {
         await newPassword.save();
         response.status(201).json(newPassword);

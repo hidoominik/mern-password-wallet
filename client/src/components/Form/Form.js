@@ -17,6 +17,8 @@ const Form = ({currentId, setCurrentId}) => {
     isPasswordKeptAsHash: user.result.isPasswordKeptAsHash,
     userPassword: user.result.password
   });
+
+
   useEffect(()=>{
     if(password) setPasswordData(password);
   },[password])
@@ -24,11 +26,12 @@ const Form = ({currentId, setCurrentId}) => {
   const handleSubmit = (e) => {
         console.log("Submit Click!");
         e.preventDefault();
+        console.log(passwordData)
         if(currentId){
           dispatch(updatePassword(currentId, passwordData))
           .then(clear())
         }else{
-          dispatch(createPassword(passwordData))
+          dispatch(createPassword({...passwordData, userPassword: user.result.password}))
           .then(clear())
         }
         

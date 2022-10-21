@@ -53,7 +53,7 @@ export const signup = async(request, response)=>{
         if(existingUser) return response.status(400).json({message:"User already exist."});
         if(password !== confirmPassword) return response.status(400).json({message:"Passwords dont match"});
         
-        //const hashedPassword = await bcrypt.hash(password, 12);
+        
         if(isPasswordKeptAsHash){
             
             hashedPassword = CryptoJS.SHA512(PEPPER+salt+password);
