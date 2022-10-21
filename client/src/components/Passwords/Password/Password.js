@@ -18,7 +18,7 @@ const Password = ({ password, setCurrentId }) => {
     const classes = useStyles();
     const dispatch = useDispatch();
 
-    console.log(password)
+    //console.log(password)
   return (
       <Card className={classes.card}>
         <CardContent>

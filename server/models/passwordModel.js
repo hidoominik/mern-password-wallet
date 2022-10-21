@@ -11,6 +11,6 @@ const passwordSchema = mongoose.Schema({
     },
 });
 
-const PasswordModel = mongoose.model('passwordModel', passwordSchema) //make our schema to an object
+const PasswordModel = mongoose.model('password', passwordSchema) //make our schema to an object
 
 export default PasswordModel;

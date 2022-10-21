@@ -11,7 +11,7 @@ import {signup, signin} from '../../actions/auth'
 const Auth = () => {
     
     const classes = useStyles();
-    const initialState = {email:'', username:'', password:'', confirmPassword:'', isPasswordHash: true}
+    const initialState = {username:'', password:'', confirmPassword:'', isPasswordKeptAsHash: true}
     const [showPassword, setShowPassword] = useState(false);
     const [isSignup, setIsSignup] = useState(false);
     const [formData, setFormData] = useState(initialState);
@@ -26,7 +26,7 @@ const Auth = () => {
         if(isSignup){
             dispatch(signup(formData,navigate))
         }else{
-
+            dispatch(signin(formData,navigate))
         }
     };
     const handleChange =(e)=>{ //Same handle change for each field from form 
@@ -52,13 +52,13 @@ const Auth = () => {
 
             <form onSubmit={handleSubmit} className={classes.form}>
                 <Grid container spacing={2}>
-                    {
+                    {/* {
                         isSignup && ( //ONLY IF isSignup == true
                             <>
                                 <Input name='email' label="Email" handleChange={handleChange} type='email'/>
                             </>
                         ) 
-                    }
+                    } */}
                     <Input name='username' label="Username" handleChange={handleChange} type='text' autoFocus/>
                     <Input name='password' label='Password' handleChange={handleChange} type = {showPassword ? "text" : "password"} handleShowPassword={handleShowPassword}/>
                     { isSignup && (
@@ -67,8 +67,8 @@ const Auth = () => {
                             <Typography align='right' variant='subtitle1'>Password will be stored using: </Typography>
                             
                             <Select
-                                name='isPasswordHash'
-                                value={formData.isPasswordHash}
+                                name='isPasswordKeptAsHash'
+                                value={formData.isPasswordKeptAsHash}
                                 label="Age"
                                 onChange={handleChange}>
                                 <MenuItem value={true}>SHA256</MenuItem>
