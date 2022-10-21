@@ -13,7 +13,9 @@ const Form = ({currentId, setCurrentId}) => {
     login:'',
     password:'',
     webAddress: '',
-    description:''
+    description:'',
+    isPasswordKeptAsHash: user.result.isPasswordKeptAsHash,
+    userPassword: user.result.password
   });
   useEffect(()=>{
     if(password) setPasswordData(password);

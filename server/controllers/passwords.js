@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 import PasswordModel from "../models/passwordModel.js";
-
+import crypto from 'crypto-js';
 
 export const getPasswords = async(request, response)=>{
     console.log('------------------------------');
@@ -19,7 +19,8 @@ export const getPasswords = async(request, response)=>{
 export const createPassword = async(request, response) => {
     const password = request.body;
     //here encrypt logic //
-  
+    console.log(password);
+    
     const newPassword = new PasswordModel({...password, creator: request.userId, createdAt: new Date().toISOString()})
     try {
         await newPassword.save();
