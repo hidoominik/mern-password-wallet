@@ -18,7 +18,7 @@ import { deletePassword } from '../../../actions/passwords';
 const Password = ({ password, setCurrentId }) => {
     const classes = useStyles();
     const dispatch = useDispatch();
-
+    const user = JSON.parse(localStorage.getItem('profile'));
     //console.log(password)
   return (
       <Card className={classes.card}>
@@ -34,15 +34,26 @@ const Password = ({ password, setCurrentId }) => {
           <Typography variant='subtitle2'>Created at: { moment(password.createdAt).fromNow()} </Typography>
         </CardContent>
         <CardActions>
-        <Button>
-            <LockOutlined fontSize="medium"/>
-          </Button>
-          <Button onClick={()=>setCurrentId(password._id)}>
-            <EditOutlined fontSize="medium"/>
-          </Button>
-          <Button>
-            <DeleteOutline onClick={() => dispatch(deletePassword(password._id))} fontSize="medium"/>
-          </Button>
+          {
+            (user?.result?._id === password?.creator) && (
+              <>
+              
+                <Button>
+                  <LockOutlined fontSize="medium"/>
+                </Button>
+
+                <Button onClick={()=>setCurrentId(password._id)}>
+                  <EditOutlined fontSize="medium"/>
+                </Button>
+          
+                <Button>
+                  <DeleteOutline onClick={() => dispatch(deletePassword(password._id))} fontSize="medium"/>
+                </Button>
+              </>
+            )
+            
+          }
+        
         </CardActions>
           
        
