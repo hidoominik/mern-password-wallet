@@ -29,7 +29,7 @@ const Password = ({ password, setCurrentId }) => {
     if(isEncrypted){
       
     dispatch(decryptPassword(password._id, user.result.password))
-      .then(setTimeout(()=>{setIsEncrypted(false)},200));
+      .then(setTimeout(()=>{setIsEncrypted(false)},300));
     }
     else{
       

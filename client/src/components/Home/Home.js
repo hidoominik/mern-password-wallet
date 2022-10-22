@@ -25,6 +25,7 @@ export const Home = () => {
     const loadUserPasswords = () =>{
       if(user.result._id){
         dispatch(getPasswords(user.result._id))
+        
       }
       
       setLoadPasswords(true);
