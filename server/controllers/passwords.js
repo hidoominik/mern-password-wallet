@@ -2,6 +2,7 @@ import mongoose from "mongoose";
 import PasswordModel from "../models/passwordModel.js";
 import CryptoJS from 'crypto-js';
 import userModel from "../models/userModel.js";
+import { response } from "express";
 
 export const getPasswords = async(request, response)=>{
     console.log('------------------------------');
@@ -20,14 +21,12 @@ export const getPasswords = async(request, response)=>{
 
 export const createPassword = async(request, response) => {
     const password = request.body;
-    //here encrypt logic //
-    console.log("Pass to encrypt:" + password.password);
-    console.log("ENCRYPTED WITH:" + password.userPassword)
-    console.log("ENCRYPTED WITH MD5:" + CryptoJS.MD5(password.userPassword).toString())
+  
+    
     const encryptedPassword = CryptoJS.AES.encrypt(password.password,CryptoJS.MD5(password.userPassword).toString());
-    //const encryptedPassword = CryptoJS.AES.encrypt(password.password, password.userPassword.slice(0, 32))
+   
     const newPassword = new PasswordModel({...password,password: encryptedPassword, creator: request.userId, createdAt: new Date().toISOString()})
-    console.log("ENCRYPTED PASS:" + encryptedPassword)
+    
     try {
         await newPassword.save();
         response.status(201).json(newPassword);
@@ -63,19 +62,19 @@ export const deletePassword = async(req, res) =>{
 export const decryptPassword = async(req,res)=>{
     const user = req.body;
     const {id: _id} = req.params;
-    console.log("---------------HELLO FROM GET DECRYPTED PASSWORD!!!------------------")
+    
     try {
         const userId = req.headers.authorization.split(" ")[2];
         const passwordData = await PasswordModel.findById(_id);
         const creatorData = await userModel.findById(passwordData.creator)
-        
+        const userData = await userModel.findById(userId);
+       
+        if(userData.password !== creatorData.password) return res.status(404).send('Passwords not matching');
         if (userId == creatorData._id){
-            console.log("DECRYPTED WITH:" + creatorData.password)
-            console.log("DECRYPTED WITH MD5:" + CryptoJS.MD5(creatorData.password))
-            console.log("PASS TO DECRYPT:" + passwordData.password)
+            
             const decryptedPassword = CryptoJS.AES.decrypt(passwordData.password,CryptoJS.MD5(creatorData.password).toString());
-            //const decryptedPassword = CryptoJS.AES.decrypt(passwordData.password, creatorData.password.slice(0, 32));
-            console.log("Pass after decrypt:" + decryptedPassword.toString(CryptoJS.enc.Utf8));
+            
+            
             passwordData.password = decryptedPassword.toString(CryptoJS.enc.Utf8);
             res.status(200).json(passwordData);
         }

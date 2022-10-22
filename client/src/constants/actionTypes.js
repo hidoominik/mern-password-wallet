@@ -6,3 +6,4 @@ export const GET_DECRYPTED = 'GET_DECRYPTED';
 
 export const AUTH = 'AUTH';
 export const LOGOUT = 'LOGOUT';
+export const CHANGE_PASSWORD = 'CHANGE_PASSWORD';

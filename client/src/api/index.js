@@ -20,3 +20,4 @@ export const decryptPassword = (id, user) => API.get(`/passwords/decrypt/${id}`,
 
 export const signin = (formData) => API.post('user/signin',formData);
 export const signup = (formData) => API.post('user/signup',formData);
+export const changePassword =(formData) => API.patch('user/changePassword',formData);

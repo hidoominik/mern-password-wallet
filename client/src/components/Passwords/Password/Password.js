@@ -2,11 +2,8 @@ import React, {useState, useEffect} from 'react'
 import useStyles from './styles'
 import {Card, CardActions, CardContent, Button, Typography} from '@material-ui/core'
 
-//import LockOpenOutlinedIcon from '@mui/icons-material/LockOpenOutlined';
-//import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
-//import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
-//import DeleteOutlineOutlinedIcon from '@mui/icons-material/DeleteOutlineOutlined';
-import MoreHorizIcon from '@material-ui/icons/MoreHoriz';
+
+
 import DeleteOutline from '@material-ui/icons/DeleteOutline';
 import EditOutlined from '@material-ui/icons/EditOutlined';
 import LockOutlined from '@material-ui/icons/LockOutlined';
@@ -22,7 +19,7 @@ const Password = ({ password, setCurrentId }) => {
     const classes = useStyles();
     const dispatch = useDispatch();
     const user = JSON.parse(localStorage.getItem('profile'));
-    //console.log(password)
+   
     const passwordEncrypt = useSelector((state)=>state.passwords); //.password from reducers>passwords
     const location = useLocation();
 
@@ -30,8 +27,8 @@ const Password = ({ password, setCurrentId }) => {
 
   const getDecryptedPassword = () =>{
     if(isEncrypted){
-
-    dispatch(decryptPassword(password._id, user.result))
+      
+    dispatch(decryptPassword(password._id, user.result.password))
       .then(setTimeout(()=>{setIsEncrypted(false)},200));
     }
     else{

@@ -7,6 +7,7 @@ import Navbar from './components/Navbar/Navbar';
 
 import Home from './components/Home/Home';
 import Auth from './components/Auth/Auth';
+import ChangePassword from './components/Auth/ChangePassword/ChangePassword';
 const App = () =>{
     
     return(
@@ -16,6 +17,7 @@ const App = () =>{
                 <Routes>
                     <Route path='/' exac element={<Home />}/>
                     <Route path='/Auth' exac element={<Auth />}/>
+                    <Route path='/Auth/changePassword' exac element={<ChangePassword />}/>
                 </Routes>
             </Container>
         
