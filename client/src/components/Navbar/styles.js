@@ -13,7 +13,9 @@ export default makeStyles((theme) => ({
     padding: '10px 50px',
   },
   heading: {
-    color: 'rgba(0,183,255, 1)',
+    fontFamily: "Courier New",
+    
+    color: 'rgba(63,81,181, 1)',
     textDecoration: 'none',
   },
   image: {
@@ -37,6 +39,7 @@ export default makeStyles((theme) => ({
   brandContainer: {
     display: 'flex',
     alignItems: 'center',
+    gap:'20px',
   },
   logout:{
     margin:'10px',
