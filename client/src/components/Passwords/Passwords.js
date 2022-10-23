@@ -8,7 +8,7 @@ import useStyles from './styles'
 const Passwords = ({setCurrentId}) => {
     const classes = useStyles();
     const passwords = useSelector((state)=>state.passwords); //.password from reducers>passwords
-    console.log(passwords)
+    
     return (
     !postMessage.length ? <CircularProgress /> : (
       <Container alignitems="stretch" spacing={3} >

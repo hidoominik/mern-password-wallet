@@ -1,4 +1,4 @@
-import { AUTH, LOGOUT } from "../constants/actionTypes";
+import { AUTH, CHANGE_PASSWORD, LOGOUT } from "../constants/actionTypes";
 
 const authReducer =(state = {authData: null}, action)=>{
     switch(action.type){
@@ -9,6 +9,10 @@ const authReducer =(state = {authData: null}, action)=>{
         case LOGOUT:
             localStorage.clear();
             return {...state, authData: null};
+        case CHANGE_PASSWORD:
+            //return action.payload;
+            localStorage.setItem('profile', JSON.stringify({...action?.data}));
+            return {...state, authData: action?.data};
         default:
             return state;
     }

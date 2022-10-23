@@ -4,7 +4,8 @@ const userSchema = mongoose.Schema({
     username: {type: String, required: true},
     password: {type: String, required: true},
     isPasswordKeptAsHash: {type: Boolean, required: true},
-    id: {type: String}
+    id: {type: String},
+    salt: {type: String, required: false}
    
 });
 

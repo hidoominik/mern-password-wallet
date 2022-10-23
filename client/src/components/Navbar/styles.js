@@ -7,12 +7,15 @@ export default makeStyles((theme) => ({
     margin: '30px 0',
     display: 'flex',
     flexDirection: 'row',
+    flexWrap: 'wrap',
     justifyContent: 'space-between',
     alignItems: 'center',
     padding: '10px 50px',
   },
   heading: {
-    color: 'rgba(0,183,255, 1)',
+    fontFamily: "Courier New",
+    
+    color: 'rgba(63,81,181, 1)',
     textDecoration: 'none',
   },
   image: {
@@ -20,8 +23,9 @@ export default makeStyles((theme) => ({
   },
   toolbar: {
     display: 'flex',
-    justifyContent: 'flex-end',
+    justifyContent: 'space-between',
     width: '400px',
+    gap: '10px'
   },
   profile: {
     display: 'flex',
@@ -35,6 +39,10 @@ export default makeStyles((theme) => ({
   brandContainer: {
     display: 'flex',
     alignItems: 'center',
+    gap:'20px',
+  },
+  logout:{
+    margin:'10px',
   },
   purple: {
     color: theme.palette.getContrastText(deepPurple[500]),
