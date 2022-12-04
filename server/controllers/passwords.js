@@ -3,7 +3,10 @@ import PasswordModel from "../models/passwordModel.js";
 import CryptoJS from 'crypto-js';
 import userModel from "../models/userModel.js";
 import { response } from "express";
+import {encrypt_AES, decrypt_AES} from "./helpers.js"; 
+//-----------------------------------------------------------------------------------------
 
+//-----------------------------------------------------------------------------------------
 export const getPasswords = async(request, response)=>{
     console.log('------------------------------');
     
@@ -23,7 +26,8 @@ export const createPassword = async(request, response) => {
     const password = request.body;
   
     
-    const encryptedPassword = CryptoJS.AES.encrypt(password.password,CryptoJS.MD5(password.userPassword).toString());
+    //const encryptedPassword = CryptoJS.AES.encrypt(password.password,CryptoJS.MD5(password.userPassword).toString());
+    const encryptedPassword = encrypt_AES(password.password, password.userPassword).toString();
    
     const newPassword = new PasswordModel({...password,password: encryptedPassword, creator: request.userId, createdAt: new Date().toISOString()})
     
@@ -43,7 +47,8 @@ export const updatePassword = async(request, response) => {
     const password = request.body;
     
     if(!mongoose.Types.ObjectId.isValid(_id)) return response.status(404).send('No password with that id');
-    const encyptedPassword = CryptoJS.AES.encrypt(password.password,CryptoJS.MD5(password.userPassword).toString());
+    //const encyptedPassword = CryptoJS.AES.encrypt(password.password,CryptoJS.MD5(password.userPassword).toString());
+    const encyptedPassword = encrypt_AES(password.password,password.userPassword).toString();
     password.password = encyptedPassword.toString();
     
     const updatedPassword = await PasswordModel.findByIdAndUpdate(_id, password, {new: true});
@@ -72,8 +77,8 @@ export const decryptPassword = async(req,res)=>{
         if(userData.password !== creatorData.password) return res.status(404).send('Passwords not matching');
         if (userId == creatorData._id){
             
-            const decryptedPassword = CryptoJS.AES.decrypt(passwordData.password,CryptoJS.MD5(creatorData.password).toString());
-            
+            //const decryptedPassword = CryptoJS.AES.decrypt(passwordData.password,CryptoJS.MD5(creatorData.password).toString());
+            const decryptedPassword = decrypt_AES(passwordData.password, creatorData.password).toString();
             
             passwordData.password = decryptedPassword.toString(CryptoJS.enc.Utf8);
             res.status(200).json(passwordData);

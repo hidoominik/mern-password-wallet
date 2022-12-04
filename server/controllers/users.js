@@ -5,10 +5,15 @@ import jwt from 'jsonwebtoken';
 import CryptoJS from 'crypto-js';
 import PasswordModel from "../models/passwordModel.js";
 import userModel from "../models/userModel.js";
-
+import {encrypt_AES, decrypt_AES, encrypt_SHA512_with_salt_and_pepper, encrypt_HmacSHA512_with_KEY, generate_Salt, create_MD5_String, } from "./helpers.js"; 
 
 const PEPPER = "Zq3t6w9z$C&F)J@N";
 const KEY = "!A%D*G-KaPdSgVkY";
+//------------------------------------------------------------------------------------------------------
+
+//-------------------------------------------------------------------------------------------------------
+
+
 
 export const signin = async(request, response)=>{
     const {username, password} = request.body;
@@ -20,12 +25,16 @@ export const signin = async(request, response)=>{
        if(!existingUser) return response.status(404).json({message:"User doesn't exist."});
         if(existingUser.isPasswordKeptAsHash){
             const salt = existingUser.salt;
-            tempPassword = CryptoJS.SHA512(PEPPER+salt+password).toString();
-            if(CryptoJS.SHA512(PEPPER+salt+password) == existingUser.password) isPasswordCorrect = true;
+
+            //tempPassword = CryptoJS.SHA512(PEPPER+salt+password).toString();
+            tempPassword = encrypt_SHA512_with_salt_and_pepper(PEPPER, salt, password).toString();
+            //if(CryptoJS.SHA512(PEPPER+salt+password) == existingUser.password) isPasswordCorrect = true;
+            if(encrypt_SHA512_with_salt_and_pepper(PEPPER,salt,password) == existingUser.password) isPasswordCorrect = true;
             console.log("sha512 user detected")
             
         }else{
-            tempPassword = CryptoJS.HmacSHA512(password, KEY).toString();
+            //tempPassword = CryptoJS.HmacSHA512(password, KEY).toString();
+            tempPassword = encrypt_HmacSHA512_with_KEY(password, KEY).toString;
             if(tempPassword == existingUser.password) isPasswordCorrect = true;
             console.log("hmac user detected")
         }
@@ -49,7 +58,8 @@ export const signup = async(request, response)=>{
     const {username, password, confirmPassword, isPasswordKeptAsHash} = request.body;
     try {
         const existingUser = await User.findOne({ username }); //search for existing user in database
-        var salt = CryptoJS.lib.WordArray.random(128/8);
+        //var salt = CryptoJS.lib.WordArray.random(128/8);
+        var salt = generate_Salt();
         var hashedPassword;
         if(existingUser) return response.status(400).json({message:"User already exist."});
         if(password !== confirmPassword) return response.status(400).json({message:"Passwords dont match"});
@@ -57,11 +67,13 @@ export const signup = async(request, response)=>{
         
         if(isPasswordKeptAsHash){
             
-            hashedPassword = CryptoJS.SHA512(PEPPER+salt+password);
+            //hashedPassword = CryptoJS.SHA512(PEPPER+salt+password);
+            hashedPassword = encrypt_SHA512_with_salt_and_pepper(PEPPER, salt, password);
         }
         else{
             
-            hashedPassword = CryptoJS.HmacSHA512(password, KEY);
+            //hashedPassword = CryptoJS.HmacSHA512(password, KEY);
+            hashedPassword = encrypt_HmacSHA512_with_KEY(password,KEY);
             salt = null;
         }
 
@@ -82,7 +94,8 @@ export const changePassword = async(req, res)=>{
  
     var isPasswordCorrect;
     var newPasswordString;
-    const newSalt = CryptoJS.lib.WordArray.random(128/8);
+    //const newSalt = CryptoJS.lib.WordArray.random(128/8);
+    const newSalt = generate_Salt();
     try{
         if(newPassword !== confirmNewPassword){
             console.log('Passwords dont match');
@@ -100,17 +113,23 @@ export const changePassword = async(req, res)=>{
         
         if(existingUser.isPasswordKeptAsHash){
             
-            if(existingUser.password == CryptoJS.SHA512(PEPPER + existingUser.salt + password)){
+           // if(existingUser.password == CryptoJS.SHA512(PEPPER + existingUser.salt + password))
+            if(existingUser.password == encrypt_SHA512_with_salt_and_pepper(PEPPER, existingUser.salt, password))
+            {
                 
                     isPasswordCorrect = true;
-                    newPasswordString = CryptoJS.SHA512(PEPPER + newSalt + newPassword).toString();
+                    //newPasswordString = CryptoJS.SHA512(PEPPER + newSalt + newPassword).toString();
+                    newPasswordString = encrypt_SHA512_with_salt_and_pepper(PEPPER, newSalt, newPassword).toString();
                    
                     
             }
         }else {
-            if(existingUser.password == CryptoJS.HmacSHA512(password, KEY).toString()){
+            //if(existingUser.password == CryptoJS.HmacSHA512(password, KEY).toString())
+            if(existingUser.password == encrypt_HmacSHA512_with_KEY(password, KEY).toString());
+            {
                 console.log('HMAC user want to change password');
-                newPasswordString = CryptoJS.HmacSHA512(newPassword, KEY).toString()
+                //newPasswordString = CryptoJS.HmacSHA512(newPassword, KEY).toString()
+                newPasswordString = encrypt_HmacSHA512_with_KEY(newPassword,KEY).toString();
                 isPasswordCorrect = true;
                 
             }
@@ -126,10 +145,12 @@ export const changePassword = async(req, res)=>{
         
         userPasswords.forEach(async (singlePassword)=>{
          
-            const temp = CryptoJS.AES.decrypt(singlePassword.password,CryptoJS.MD5(existingUser.password).toString());
+            //const temp = CryptoJS.AES.decrypt(singlePassword.password,CryptoJS.MD5(existingUser.password).toString());
+            const temp = decrypt_AES(singlePassword.password,existingUser.password).toString();
             const oldPasswordPlainText = temp.toString(CryptoJS.enc.Utf8);
             
-            const newEncryptedPassword = CryptoJS.AES.encrypt(oldPasswordPlainText,CryptoJS.MD5(newPasswordString).toString())
+            //const newEncryptedPassword = CryptoJS.AES.encrypt(oldPasswordPlainText,CryptoJS.MD5(newPasswordString).toString())
+            const newEncryptedPassword = encrypt_AES(oldPasswordPlainText,newPasswordString).toString();
             
             singlePassword.password = newEncryptedPassword.toString();
 
