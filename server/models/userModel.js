@@ -5,7 +5,9 @@ const userSchema = mongoose.Schema({
     password: {type: String, required: true},
     isPasswordKeptAsHash: {type: Boolean, required: true},
     id: {type: String},
-    salt: {type: String, required: false}
+    salt: {type: String, required: false},
+    numberOfUnsuccessfulLogins: {type: Number, default: 0},
+    lockedUntil:{ type: Date },
    
 });
 

@@ -5,48 +5,123 @@ import jwt from 'jsonwebtoken';
 import CryptoJS from 'crypto-js';
 import PasswordModel from "../models/passwordModel.js";
 import userModel from "../models/userModel.js";
-
+import ipAddressModel from "../models/ipAddressModel.js";
+import { checkIfIpIsBanned } from "./managers/ipAddress.js";
+import loginsModel from "../models/loginsModel.js";
 
 const PEPPER = "Zq3t6w9z$C&F)J@N";
 const KEY = "!A%D*G-KaPdSgVkY";
 
 export const signin = async(request, response)=>{
+
     const {username, password} = request.body;
-    try {
-       console.log('SIGN IN WORKS');
-       var tempPassword;
-       var isPasswordCorrect = false;
-       const existingUser = await User.findOne({ username }); //search for existing user in database
-       if(!existingUser) return response.status(404).json({message:"User doesn't exist."});
-        if(existingUser.isPasswordKeptAsHash){
-            const salt = existingUser.salt;
-            tempPassword = CryptoJS.SHA512(PEPPER+salt+password).toString();
-            if(CryptoJS.SHA512(PEPPER+salt+password) == existingUser.password) isPasswordCorrect = true;
-            console.log("sha512 user detected")
+    const reqIpAddress = (request.headers['x-forwarded-for'] || request.connection.remoteAddress || '').split(',')[0].trim();
+
+    var ipData = {ipAddress: reqIpAddress, unsuccessfullLoginCount:'',successfullLoginCount:'', isBanned:'', lockedUntil:''}
+    var IP = await ipAddressModel.findOne({ipAddress: reqIpAddress});
+
+    if(!IP){
+       ipData = {ipAddress: reqIpAddress, unsuccessfullLoginCount: 1,successfullLoginCount: 0, isBanned: false};
+        const createIp = await ipAddressModel.create({ipAddress: reqIpAddress, unsuccessfullLoginCount: 1,successfullLoginCount: 0, isBanned: false, lockedUntil: Date.now()});
+        IP = await ipAddressModel.findOne({ipAddress: reqIpAddress});
+    }
+    
+
+    if(!IP?.isBanned){
+        console.log(IP.lockedUntil)
+        console.log(Date.now())
+        if(IP.lockedUntil < Date.now()){
             
-        }else{
-            tempPassword = CryptoJS.HmacSHA512(password, KEY).toString();
-            if(tempPassword == existingUser.password) isPasswordCorrect = true;
-            console.log("hmac user detected")
-        }
-           
-      
+            try {
+            console.log('SIGN IN WORKS');
+            var tempPassword;
+            var isPasswordCorrect = false;
+            var existingUser = await User.findOne({ username }); //search for existing user in database
+            console.log(existingUser)
+            console.log(Date.now())
+            if(existingUser.lockedUntil > Date.now()){
+                return response.status(400).json({message:"Too many wrong attepts to login at this accout. Wait until " 
+                   + existingUser.lockedUntil + " and try again."});
+                }
+            if(!existingUser) return response.status(404).json({message:"User doesn't exist."});
+            
 
-       if(!isPasswordCorrect) return response.status(400).json({message: "Invalid credentials"});
+                if(existingUser.isPasswordKeptAsHash){
+                    const salt = existingUser.salt;
+                    tempPassword = CryptoJS.SHA512(PEPPER+salt+password).toString();
+                    if(CryptoJS.SHA512(PEPPER+salt+password) == existingUser.password) isPasswordCorrect = true;
+                    console.log("sha512 user detected")
+                    
+                }else{
+                    tempPassword = CryptoJS.HmacSHA512(password, KEY).toString();
+                    if(tempPassword == existingUser.password) isPasswordCorrect = true;
+                    console.log("hmac user detected")
+                }
+                
+            
 
-       const token = jwt.sign({ username: existingUser.username, id: existingUser._id}, 'test', {expiresIn: "1h"}) //test is a secret
+            if(!isPasswordCorrect) {
+                var existingIp = await ipAddressModel.findOne({ipAddress: reqIpAddress});
+                let existingUserLogins = await userModel.findOne({username: username});
+               
+                existingUserLogins.numberOfUnsuccessfulLogins++;
+                console.log(existingUserLogins.numberOfUnsuccessfulLogins)
+                    if(existingUserLogins.numberOfUnsuccessfulLogins > 0){
+                        existingUserLogins.lockedUntil = Date.now() + 100 * 60;                      
+                       
+                    }
+                    if(existingUserLogins.numberOfUnsuccessfulLogins > 2){
+                        existingUserLogins.lockedUntil = Date.now() + 2*1000*60;
+                       
+                    }
+                    
+                    existingUser.save();
 
-       response.status(200).json({result: existingUser, token});
+                loginsModel.create({userId: existingUser._id, ipAddressId: IP.id, wasSuccessful: false})
 
-    } catch (error) {   
 
-      console.log(error);
-      response.status(500).json({message: 'Something went wrong...'})
+                    existingIp.unsuccessfullLoginCount++;
+                    console.log(existingIp);
 
+                    if(existingIp.unsuccessfullLoginCount == 3){
+                        existingIp.lockedUntil = Date.now() + 500 * 60;
+                    }
+                    if(existingIp.unsuccessfullLoginCount > 3 && existingIp.unsuccessfullLoginCount <= 4){
+                        existingIp.lockedUntil = Date.now() + 2*1000*60;
+                    }
+                    if(existingIp.unsuccessfullLoginCount >= 5){
+                        existingIp.isBanned = true;
+                    }
+                    existingIp.save();
+                
+                return response.status(400).json({message: "Invalid credentials"});
+                    
+
+            }
+
+            const token = jwt.sign({ username: existingUser.username, id: existingUser._id}, 'test', {expiresIn: "1h"}) //test is a secret
+            IP.unsuccessfullLoginCount = 0;
+            IP.successfullLoginCount ++;
+            IP.save();
+            loginsModel.create({userId: existingUser._id, ipAddressId: IP.id, wasSuccessful: true})
+            response.status(200).json({result: existingUser, token});
+
+            } catch (error) {   
+
+            console.log(error);
+            response.status(500).json({message: 'Something went wrong...'})
+
+            }
+            }else{
+                return response.status(400).json({message: 'Login restriction! Wait until ' + IP.lockedUntil + " and try again."})
+            }
+    }else{
+        return response.status(400).json({message: 'This ip is banned!'})
     }
 }
 export const signup = async(request, response)=>{
     const {username, password, confirmPassword, isPasswordKeptAsHash} = request.body;
+    console.log(request.body)
     try {
         const existingUser = await User.findOne({ username }); //search for existing user in database
         var salt = CryptoJS.lib.WordArray.random(128/8);
@@ -147,4 +222,17 @@ export const changePassword = async(req, res)=>{
     } catch (error) {
         console.log(error)
     }
+}
+
+export const getLastLogins = async(request, response) =>{
+    const {userId} = request.body;
+    var successLogins = await loginsModel.find({userId: userId, wasSuccessful:true});
+    var failedLogins = await loginsModel.find({userId: userId, wasSuccessful:false});
+    if(!successLogins || !failedLogins) return response.status(404).json({message: "Brak historii logowania"});
+    const lastLogins = {
+        lastSuccesfullLogin: successLogins.slice(-2)[0],
+        lastFailedLogin: failedLogins.slice(-1)[0] 
+    } 
+    
+    return response.status(200).json({result: lastLogins});
 }

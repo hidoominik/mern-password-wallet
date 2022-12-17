@@ -8,7 +8,6 @@ export const getPasswords = async(request, response)=>{
     console.log('------------------------------');
     
     const {id: _id} = request.params;
-    
     try {
         const passwordsData = await PasswordModel.find({creator:_id});
       
