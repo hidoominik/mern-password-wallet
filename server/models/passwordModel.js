@@ -6,6 +6,10 @@ const passwordSchema = mongoose.Schema({
     password: String,
     webAddress: String,
     description: String,
+    isEditable: {
+        type: Boolean,
+        default: false
+    },
     createdAt:{
         type: Date,
         default: new Date()

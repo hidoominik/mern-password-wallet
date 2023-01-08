@@ -2,11 +2,10 @@ import mongoose from "mongoose";
 import PasswordModel from "../models/passwordModel.js";
 import CryptoJS from 'crypto-js';
 import userModel from "../models/userModel.js";
+import sharedPasswordModel from "../models/sharedPasswordModel.js";
 import { response } from "express";
 
 export const getPasswords = async(request, response)=>{
-    console.log('------------------------------');
-    
     const {id: _id} = request.params;
     try {
         const passwordsData = await PasswordModel.find({creator:_id});
@@ -81,6 +80,95 @@ export const decryptPassword = async(req,res)=>{
             res.status(500).json({message:"Something went wrong"})
         }
         
+    } catch (error) {
+        console.log(error)
+        res.status(404).json({message: error.message})
+    }
+}
+
+export const sharePassword = async(req, res) => {
+    //in request.body 
+    //1. creatorId, 2. passwordId, 3. holderId
+    const requestData = req.body;
+    const {id: passwordId} = req.params;
+        // const creatorId = req.headers.authorization.split(" ")[2];
+        if(!mongoose.Types.ObjectId.isValid(requestData.creatorId)) return res.status(404).send('No user (owner) with that id');
+        if(!mongoose.Types.ObjectId.isValid(passwordId)) return res.status(404).send('No password with that id');
+        if(!mongoose.Types.ObjectId.isValid(requestData.holderId)) return res.status(404).send('No user (holder) with that id');
+
+        const password = await PasswordModel.findById(passwordId);
+        
+        if(requestData.creatorId === password.creator){
+            const newSharedPassword = new sharedPasswordModel({creatorId: requestData.creatorId, passwordId: passwordId, holderId: requestData.holderId});
+            try {
+                    await newSharedPassword.save();
+                    res.status(201).json(newSharedPassword);
+
+                } catch (error) {
+                    res.status(409).json({message: error.message})
+                }  
+
+        }
+        else{
+            res.status(409).json({message: "Only owner can share password"})
+        }
+}
+
+export const stopSharingPassword = async(req, res) => {
+    const {id: passwordId} = req.params;
+    const holderId = req.body.holderId;
+    const userId = req.body.userId;
+    if(!mongoose.Types.ObjectId.isValid(passwordId)) return res.status(404).send('No password with that id');
+    if(!mongoose.Types.ObjectId.isValid(holderId)) return res.status(404).send('No user with that id');
+
+    const password = await sharedPasswordModel.findOne({passwordId:passwordId, holderId: holderId});
+    if(password.creatorId === userId){
+       await sharedPasswordModel.findOneAndRemove({passwordId:passwordId, holderId: holderId});
+        res.json({message:'Password no longer shared!'}); 
+    }else{
+        res.json({message:'Only owner can stop sharing password'}); 
+    }
+    
+}
+
+export const getAllSharedPasswords = async(req,res)=>{
+    const {id: _id} = req.params;
+    try {
+        const passwordsData = await sharedPasswordModel.find({holderId:_id});
+      
+        res.status(200).json(passwordsData);
+    } catch (error) {
+        res.status(404).json({message: error.message})
+      
+    }
+}
+
+export const decryptSharedPassword = async(req, res) =>{
+    const {id: passwordId} = req.params;
+    const userId = req.body.userId;
+
+    if(!mongoose.Types.ObjectId.isValid(passwordId)) return res.status(404).send('No password with that id');
+    if(!mongoose.Types.ObjectId.isValid(userId)) return res.status(404).send('No user with that id');
+
+    const sharedPassword = await sharedPasswordModel.findOne({passwordId: passwordId, holderId: userId});
+    if(!mongoose.Types.ObjectId.isValid(sharedPassword.id)) return res.status(404).send('No shared password with that id');
+
+    const passwordOwner = await userModel.findById(sharedPassword.creatorId);
+
+    try {
+        const passwordData = await PasswordModel.findById(sharedPassword.passwordId);
+        console.log(passwordOwner._id)
+        console.log(passwordData.creator)
+        if(passwordOwner._id.toString() === passwordData.creator){
+            const decryptedPassword = CryptoJS.AES.decrypt(passwordData.password,CryptoJS.MD5(passwordOwner.password).toString());
+            
+            
+            passwordData.password = decryptedPassword.toString(CryptoJS.enc.Utf8);
+            res.status(200).json(passwordData);
+        }
+        else{
+            res.status(500).json({message:"Something went wrong"})
+        }
     } catch (error) {
         console.log(error)
         res.status(404).json({message: error.message})
