@@ -236,3 +236,13 @@ export const getLastLogins = async(request, response) =>{
     
     return response.status(200).json({result: lastLogins});
 }
+
+
+export const unbanIp = async(request, response) => {
+    const reqIpAddress = (request.headers['x-forwarded-for'] || request.connection.remoteAddress || '').split(',')[0].trim();
+    var ipData = await ipAddressModel.findOne({ipAddress: reqIpAddress});
+    ipData.isBanned = false;
+    ipData.unsuccessfullLoginCount = 0;
+    ipData.save();
+    return response.status(200).json({message:"Ip sucessfully unbanned"})
+}
